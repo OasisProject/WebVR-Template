@@ -54,10 +54,10 @@ THREE.VRKeyControls = function ( object, domElement ) {
 
 	// Set to true to disable this control
 	this.noPan = false;
-	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
+	this.keyPanSpeed = 30.0;	// pixels moved per arrow key push
 
 	// Set to true to automatically rotate around the target
-	this.autoRotate = true;
+	this.autoRotate = false;
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
 	// How far you can orbit vertically, upper and lower limits.
@@ -327,9 +327,9 @@ THREE.VRKeyControls = function ( object, domElement ) {
 		// move target to panned location
 		this.target.add( pan );
 
-		offset.x = radius * Math.sin( phi ) * Math.sin( theta );
-		offset.y = radius * Math.cos( phi );
-		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
+		offset.x = Math.sin( phi ) * Math.sin( theta );
+		offset.y = Math.cos( phi );
+		offset.z = Math.sin( phi ) * Math.cos( theta );
 
 		// rotate offset back to "camera-up-vector-is-up" space
 		offset.applyQuaternion( quatInverse );
