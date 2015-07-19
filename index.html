@@ -2,7 +2,7 @@
 
 <html lang="en">
 <head>
-<title>Web VR boilerplate (Cardboard and Oculus)</title>
+<title>CreepVR</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -116,36 +116,6 @@ var manager = new WebVRManager(renderer, effect, {hideButton: false});
     }
 
     
-// Create 3D objects.
-//var geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-//var material = new THREE.MeshNormalMaterial();
-//var cube = new THREE.Mesh(geometry, material);
-
-// Position cube mesh
-//cube.position.z = -1;
-
-// Add cube mesh to your three.js scene
-//scene.add(cube);
-
-// Also add a repeating grid as a skybox.
-//var boxWidth = 10;
-//var texture = THREE.ImageUtils.loadTexture(
-//  'img/box.png'
-//);
-//texture.wrapS = THREE.RepeatWrapping;
-//texture.wrapT = THREE.RepeatWrapping;
-//texture.repeat.set(boxWidth, boxWidth);
-
-//var geometry = new THREE.BoxGeometry(boxWidth, boxWidth, boxWidth);
-//var material = new THREE.MeshBasicMaterial({
-//  map: texture,
-//  color: 0x333333,
-//  side: THREE.BackSide
-//});
-//
-//var skybox = new THREE.Mesh(geometry, material);
-//scene.add(skybox);
-
 // Request animation frame loop function
 function animate() {
   // Apply rotation to cube mesh
