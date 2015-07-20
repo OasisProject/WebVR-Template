@@ -30,36 +30,33 @@ body {
 CARDBOARD_DEBUG = false;
 </script>
 
-<!--
-  three.js 3d library
-  -->
-<script src="js/three.js"></script>
-
+<!--        INCLUDES        -->
     
+<!--
+  three.js 3d library -->
+<script src="js/three.js"></script>
+<!--
+    VRKeyControls.js based off OrbitControls.js. Used for first person VR controls-->
 <script src="js/VRKeyControls.js"></script>
-
-
 <!--
-  VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object.
-   -->
+  VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object. -->
 <script src="js/VRControls.js"></script>
-
 <!--
-  VREffect.js handles stereo camera setup and rendering.
-  -->
+  VREffect.js handles stereo camera setup and rendering.  -->
 <script src="js/VREffect.js"></script>
-
 <!--
-  A polyfill for WebVR using the Device{Motion,Orientation}Event API.
-  -->
+  A polyfill for WebVR using the Device{Motion,Orientation}Event API.  -->
 <script src="js/webvr-polyfill.js"></script>
-
 <!--
-  Helps enter and exit VR mode, provides best practices while in VR.
-  -->
+  Helps enter and exit VR mode, provides best practices while in VR.  -->
 <script src="js/webvr-manager.js"></script>
-
+    
+  
+    
+<!--        APPLICATION LOGIC         -->
 <script>
+    
+//THREEJS INIT    
 //Setup three.js WebGL renderer
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -72,25 +69,24 @@ var scene = new THREE.Scene();
 
 // Create a three.js camera.
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.3, 10000);
-camera.position.z = -10;
     
 
+// VR INIT
 // Apply VR headset positional data to camera.
-var orbitcontrols = new THREE.VRKeyControls(camera);
+var orbitcontrols = new THREE.VRKeyControls(camera);    
 
-    
-//camera.position.z = -50;
-// Store the position of the VR HMD in a dummy camera.
+// Store the position of the VR HMD in a dummy camera to allow for panning and junk
 var fakeCamera = new THREE.Object3D();
 var vrControls = new THREE.VRControls(fakeCamera);
-
 // Apply VR stereo rendering to renderer.
 var effect = new THREE.VREffect(renderer);
 effect.setSize(window.innerWidth, window.innerHeight);
-
 // Create a VR manager helper to enter and exit VR mode.
 var manager = new WebVRManager(renderer, effect, {hideButton: false});
 
+
+    
+// OBJECT INITIALIZATION STEP
     
 // Create All da planes    117
     function Plane(x,y,z,width,height,colour) {
@@ -112,34 +108,53 @@ var manager = new WebVRManager(renderer, effect, {hideButton: false});
         planes[i] = new Plane(i*0.22,0,-1,0.2,10.0,"#"+((1<<24)*Math.random()|0).toString(16));
        
         scene.add(planes[i].plane);
+    }    
+    
+    for (var i= 0; i < numberOfPlanes; i++) {
+        planes[i] = new Plane(i*0.22,0,3,0.2,10.0,"#"+((1<<24)*Math.random()|0).toString(16));
+       
+        scene.add(planes[i].plane);
     }
 
     
-// Request animation frame loop function
+    
+    
+// MAIN ANIMATION LOOP. CALL ANY UPDATES ON OBJECTS HERE
 function animate() {
-  // Apply rotation to cube mesh
+    
+    
+  // WORLD UPDATE STEP
+    
+    //rotate one row of planes
   for(var i = 0; i < planes.length; i++) {
     planes[i].plane.rotation.y += 0.1;   
   }
 
+    
   // Update VR headset position and apply to camera.
   orbitcontrols.update();
   vrControls.update();
-
-     // Temporarily save the orbited camera position
+  
+    // Temporarily save the orbited camera position
   var orbitPos = camera.position.clone();
 
+    //APPLY HEADSET TRACKING TO CAMERA POSITION
+    
+    
   // Apply the VR HMD camera position and rotation
   // on top of the orbited camera.
-  var rotatedPosition = fakeCamera.position.applyQuaternion(
-    camera.quaternion);
+  var rotatedPosition = fakeCamera.position.applyQuaternion(camera.quaternion);
   camera.position.add(rotatedPosition);
   camera.quaternion.multiply(fakeCamera.quaternion);
     
-  // Render the scene through the manager.
+    
+    
+  // Render the scene through the VR manager.
   manager.render(scene, camera);
 
   camera.position.copy(orbitPos);
+    
+  //REQUEST THE NEXT FRAME OF ANIMATION, CREATES THE LOOP
   requestAnimationFrame(animate);
 }
 
