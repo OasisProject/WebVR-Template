@@ -127,7 +127,10 @@ function animate() {
     
     //rotate one row of planes
   for(var i = 0; i < planes.length; i++) {
-    planes[i].plane.rotation.y += 0.1;   
+    planes[i].plane.rotation.y += 0.1;
+//    planes[i].plane.position.z += Math.cos(planes[i].plane.position.z camera.position.z) / 10;
+//    planes[i].plane.position.x += Math.sin(planes[i].plane.position.x camera.position.x) / 10
+//    planes[i].plane.rotation.z += Math.sin(planes[i].plane.position.z) / 20
   }
 
     
