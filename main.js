@@ -1,0 +1,1 @@
+var VRTemplate = require('./custom/vr-template');

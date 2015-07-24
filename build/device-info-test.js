@@ -162,4 +162,4 @@ ctx.fillRect(x - size/2, y - size/2, size, size);
 
 console.log('Placing eye at (%d, %d).', x, y);
 
-},{"../src/device-info.js":1}]},{},[3]);
+},{"../js/device-info.js":1}]},{},[3]);
