@@ -9,14 +9,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <style>
-body {
-  background-color: #000;
-  color: #fff;
-  margin: 0px;
-  padding: 0;
-  overflow: hidden;
-}
+    body {
+      background-color: #000;
+      color: #fff;
+      margin: 0px;
+      padding: 0;
+      overflow: hidden;
+    }
 </style>
+    
+<script src="/bundle.js"></script>
+
 </head>
 
 <body>
@@ -30,146 +33,39 @@ body {
 CARDBOARD_DEBUG = false;
 </script>
 
-<!--        INCLUDES        -->
-    
-<!--
-  three.js 3d library -->
-<script src="./bundle.js"></script>
-
-    
-
-
-    
-<!--        APPLICATION LOGIC         -->
 <script>
     
     
-    //var whatever = 
-////THREEJS INIT    
-////Setup three.js WebGL renderer
-//var renderer = new THREE.WebGLRenderer({ antialias: true });
-//renderer.setPixelRatio(window.devicePixelRatio);
-//
-//// Append the canvas element created by the renderer to document body element.
-//document.body.appendChild(renderer.domElement);
-//
-//// Create a three.js scene.
-//var scene = new THREE.Scene();
-//
-////var bodyObject = new THREE.Object3D();
-//
-//// Create a three.js camera.
-//var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.3, 10000);
-////bodyObject.add(camera);    
-//
-//// VR INIT
-//// Apply VR headset positional data to camera.
-//var orbitcontrols = new THREE.VRKeyControls(camera);    
-//
-//// Store the position of the VR HMD in a dummy camera to allow for panning and junk
-//var fakeCamera = new THREE.Object3D();
-//var vrControls = new THREE.VRControls(fakeCamera);
-//// Apply VR stereo rendering to renderer.
-//var effect = new THREE.VREffect(renderer);
-//effect.setSize(window.innerWidth, window.innerHeight);
-//// Create a VR manager helper to enter and exit VR mode.
-//var manager = new WebVRManager(renderer, effect, {hideButton: false});
-
-
-    VRTemplate.init();
-// OBJECT INITIALIZATION STEP
+//Initialize VR Scene and headsets
+VRTemplate.init();
     
-// Create All da planes    117
-    function Plane(x,y,z,width,height,colour) {
-        
-        this.geometry = new THREE.PlaneBufferGeometry(width,height);
-        this.material = new THREE.MeshBasicMaterial( {color: colour, side: THREE.DoubleSide} );
-        
-        this.plane = new THREE.Mesh( this.geometry, this.material );
-        this.plane.position.x = x;
-        this.plane.position.y = y;
-        this.plane.position.z = z;
-        
-    };
+var geometry = new window.THREE.PlaneGeometry( 5, 20, 32 );
+var material = new window.THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+var plane = new window.THREE.Mesh( geometry, material );
+VRTemplate.addToScene( plane );
     
-    var numberOfPlanes = 117;
-    var planes = [numberOfPlanes];
-    
-    for (var i= 0; i < numberOfPlanes; i++) {
-        planes[i] = new Plane(i*0.22,0,-1,0.2,10.0,"#"+((1<<24)*Math.random()|0).toString(16));
-       
-        scene.add(planes[i].plane);
-    }    
-    
-    for (var i= 0; i < numberOfPlanes; i++) {
-        planes[i] = new Plane(i*0.22,0,3,0.2,10.0,"#"+((1<<24)*Math.random()|0).toString(16));
-       
-        scene.add(planes[i].plane);
-    }
-
+//kick off update loop
+VRTemplate.animate();
     
     
-    
-//// MAIN ANIMATION LOOP. CALL ANY UPDATES ON OBJECTS HERE
-//function animate() {
-//    
-//    
-//  // WORLD UPDATE STEP
-//    
-//    //rotate one row of planes
-//  for(var i = 0; i < planes.length; i++) {
-//    planes[i].plane.rotation.y += 0.1;
-//  }
-//
-//  //  bodyObject.translateZ(-0.05);
-//  // Update VR headset position and apply to camera.
-//  orbitcontrols.update();
-//  vrControls.update();
-//  
-//    // Temporarily save the orbited camera position
-//  var orbitPos = camera.position.clone();
-//
-//    //APPLY HEADSET TRACKING TO CAMERA POSITION
-//    
-//    
-//  // Apply the VR HMD camera position and rotation
-//  // on top of the orbited camera.
-//  var rotatedPosition = fakeCamera.position.applyQuaternion(camera.quaternion);
-//  camera.position.add(rotatedPosition);
-//  camera.quaternion.multiply(fakeCamera.quaternion);
-//
-//    
-//    
-//  // Render the scene through the VR manager.
-//  manager.render(scene, camera);
-//
-//  camera.position.copy(orbitPos);
-//    
-//  //REQUEST THE NEXT FRAME OF ANIMATION, CREATES THE LOOP
-//  requestAnimationFrame(animate);
-//}
-
-// Kick off animation loop
-animate();
-
 // Reset the position sensor when 'z' pressed.
 function onKey(event) {
-  if (event.keyCode == 90) { // z
-    controls.resetSensor();
-  }
+//  if (event.keyCode == 90) { // z
+//    controls.resetSensor();
+//  }
 };
 
 window.addEventListener('keydown', onKey, true);
 
 // Handle window resizes
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-
-  effect.setSize( window.innerWidth, window.innerHeight );
+//  camera.aspect = window.innerWidth / window.innerHeight;
+//  camera.updateProjectionMatrix();
+//
+//  effect.setSize( window.innerWidth, window.innerHeight );
 }
 
-window.addEventListener('resize', onWindowResize, false);
+//window.addEventListener('resize', onWindowResize, false);
 
 </script>
 

@@ -1,73 +1,63 @@
 //THREEJS INIT    
-var three = require('three')
-var keycontrols = require('../src/VRKeyControls.js')
-var vrcontrols = require('../src/VRControls.js')
-var VREffect = require('../src/VREffect.js')
-var polyfill = require('webvr-polyfill')
-var webvrmanager = require('../src/webvr-manager')
+window.THREE = require('three')
+window.keycontrols = require('../src/VRKeyControls.js')
+window.vrcontrols = require('../src/VRControls.js')
+window.VREffect = require('../src/VREffect.js')
+window.polyfill = require('webvr-polyfill')
+window.webvrmanager = require('../src/webvr-manager')
                        
   
-var renderer = undefined
+window.renderer = undefined
 var scene = undefined
 var camera = undefined
 var orbitcontrols = undefined
 var fakeCamera = undefined
 var vrControls = undefined
-var effect = undefined
+window.effect = undefined
 var manager = undefined
 
 
-module.exports = { 
+module.exports = VRTemplate = { 
     init: function() {
 //Setup three.js WebGL renderer
-    renderer = new three.WebGLRenderer({ antialias: true })
-    renderer.setPixelRatio(window.devicePixelRatio);
+    window.renderer = new window.THREE.WebGLRenderer({ antialias: true })
+    window.renderer.setPixelRatio(window.devicePixelRatio);
 
     // Append the canvas element created by the renderer to document body element.
     document.body.appendChild(renderer.domElement);
 
     // Create a three.js scene.
-    scene = new three.Scene();4
-
-    //var bodyObject = new THREE.Object3D();
+    scene = new window.THREE.Scene();
 
     // Create a three.js camera.
-    camera = new three.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.3, 10000);
-    //bodyObject.add(camera);    
-
+    camera = new window.THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.3, 10000);
+       
     // VR INIT
     // Apply VR headset positional data to camera.
-    orbitcontrols = new keycontrols.VRKeyControls(camera);    
+    orbitcontrols = new window.keycontrols.VRKeyControls(camera);    
 
     // Store the position of the VR HMD in a dummy camera to allow for panning and junk
-    fakeCamera = new three.Object3D();
-    vrControls = new three.VRControls(fakeCamera);
+    fakeCamera = new window.THREE.Object3D();
+    vrControls = new window.vrcontrols.VRControls(fakeCamera);
     // Apply VR stereo rendering to renderer.
-    effect = new three.VREffect(renderer);
+    effect = new window.VREffect.VREffect(renderer);
     effect.setSize(window.innerWidth, window.innerHeight);
     // Create a VR manager helper to enter and exit VR mode.
-    manager = new webvrmanager.WebVRManager(renderer, effect, {hideButton: false});
+    manager = new window.webvrmanager.WebVRManager(window.renderer, window.effect, {hideButton: false});
 
     },
-
 
 
     // MAIN ANIMATION LOOP. CALL ANY UPDATES ON OBJECTS HERE
     animate: function() {
 
-        if (renderer === undefined) {
+        if (window.renderer === undefined) {
             console.log('must run .Init() before animating.')
             return
         }
 
      // WORLD UPDATE STEP
 
-      //rotate one row of planes
-     for(var i = 0; i < planes.length; i++) {
-       planes[i].plane.rotation.y += 0.1;
-     }
-
-     //  bodyObject.translateZ(-0.05);
      // Update VR headset position and apply to camera.
      orbitcontrols.update();
      vrControls.update();
@@ -92,6 +82,15 @@ module.exports = {
      camera.position.copy(orbitPos);
 
      //REQUEST THE NEXT FRAME OF ANIMATION, CREATES THE LOOP
-     requestAnimationFrame(animate);
+     requestAnimationFrame(module.exports.animate);
+    },
+    
+    addToScene: function (object3D) {
+        
+        scene.add(object3D);   
     },
 }
+
+document.addEventListener("onDOMReady", function() {
+    init();
+})

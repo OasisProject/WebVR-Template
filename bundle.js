@@ -1,74 +1,64 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 //THREEJS INIT    
-var three = require('three')
-var keycontrols = require('../src/VRKeyControls.js')
-var vrcontrols = require('../src/VRControls.js')
-var VREffect = require('../src/VREffect.js')
-var polyfill = require('webvr-polyfill')
-var webvrmanager = require('../src/webvr-manager')
+window.THREE = require('three')
+window.keycontrols = require('../src/VRKeyControls.js')
+window.vrcontrols = require('../src/VRControls.js')
+window.VREffect = require('../src/VREffect.js')
+window.polyfill = require('webvr-polyfill')
+window.webvrmanager = require('../src/webvr-manager')
                        
   
-var renderer = undefined
+window.renderer = undefined
 var scene = undefined
 var camera = undefined
 var orbitcontrols = undefined
 var fakeCamera = undefined
 var vrControls = undefined
-var effect = undefined
+window.effect = undefined
 var manager = undefined
 
 
-module.exports = { 
+module.exports = VRTemplate = { 
     init: function() {
 //Setup three.js WebGL renderer
-    renderer = new three.WebGLRenderer({ antialias: true })
-    renderer.setPixelRatio(window.devicePixelRatio);
+    window.renderer = new window.THREE.WebGLRenderer({ antialias: true })
+    window.renderer.setPixelRatio(window.devicePixelRatio);
 
     // Append the canvas element created by the renderer to document body element.
     document.body.appendChild(renderer.domElement);
 
     // Create a three.js scene.
-    scene = new three.Scene();4
-
-    //var bodyObject = new THREE.Object3D();
+    scene = new window.THREE.Scene();
 
     // Create a three.js camera.
-    camera = new three.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.3, 10000);
-    //bodyObject.add(camera);    
-
+    camera = new window.THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.3, 10000);
+       
     // VR INIT
     // Apply VR headset positional data to camera.
-    orbitcontrols = new keycontrols.VRKeyControls(camera);    
+    orbitcontrols = new window.keycontrols.VRKeyControls(camera);    
 
     // Store the position of the VR HMD in a dummy camera to allow for panning and junk
-    fakeCamera = new three.Object3D();
-    vrControls = new three.VRControls(fakeCamera);
+    fakeCamera = new window.THREE.Object3D();
+    vrControls = new window.vrcontrols.VRControls(fakeCamera);
     // Apply VR stereo rendering to renderer.
-    effect = new three.VREffect(renderer);
+    effect = new window.VREffect.VREffect(renderer);
     effect.setSize(window.innerWidth, window.innerHeight);
     // Create a VR manager helper to enter and exit VR mode.
-    manager = new webvrmanager.WebVRManager(renderer, effect, {hideButton: false});
+    manager = new window.webvrmanager.WebVRManager(window.renderer, window.effect, {hideButton: false});
 
     },
-
 
 
     // MAIN ANIMATION LOOP. CALL ANY UPDATES ON OBJECTS HERE
     animate: function() {
 
-        if (renderer === undefined) {
+        if (window.renderer === undefined) {
             console.log('must run .Init() before animating.')
             return
         }
 
      // WORLD UPDATE STEP
 
-      //rotate one row of planes
-     for(var i = 0; i < planes.length; i++) {
-       planes[i].plane.rotation.y += 0.1;
-     }
-
-     //  bodyObject.translateZ(-0.05);
      // Update VR headset position and apply to camera.
      orbitcontrols.update();
      vrControls.update();
@@ -93,10 +83,18 @@ module.exports = {
      camera.position.copy(orbitPos);
 
      //REQUEST THE NEXT FRAME OF ANIMATION, CREATES THE LOOP
-     requestAnimationFrame(animate);
+     requestAnimationFrame(module.exports.animate);
+    },
+    
+    addToScene: function (object3D) {
+        
+        scene.add(object3D);   
     },
 }
 
+document.addEventListener("onDOMReady", function() {
+    init();
+})
 },{"../src/VRControls.js":11,"../src/VREffect.js":12,"../src/VRKeyControls.js":13,"../src/webvr-manager":21,"three":3,"webvr-polyfill":7}],2:[function(require,module,exports){
 var VRTemplate = require('./custom/vr-template');
 },{"./custom/vr-template":1}],3:[function(require,module,exports){
@@ -38049,8 +38047,10 @@ module.exports.VREffect = function ( renderer, onError ) {
 
 			}
 
-			var size = renderer.getSize();
-			size.width /= 2;
+			var sizew = renderer.width;
+            var sizeh = renderer.height;
+            
+			sizew /= 2;
 
 			renderer.enableScissorTest( true );
 			renderer.clear();
@@ -38067,13 +38067,13 @@ module.exports.VREffect = function ( renderer, onError ) {
 			cameraR.translateX( eyeTranslationR.x * this.scale );
 
 			// render left eye
-			renderer.setViewport( 0, 0, size.width, size.height );
-			renderer.setScissor( 0, 0, size.width, size.height );
+			renderer.setViewport( 0, 0, sizew, sizeh );
+			renderer.setScissor( 0, 0, sizew, sizeh );
 			renderer.render( sceneL, cameraL );
 
 			// render right eye
-			renderer.setViewport( size.width, 0, size.width, size.height );
-			renderer.setScissor( size.width, 0, size.width, size.height );
+			renderer.setViewport( sizew, 0, sizew, sizeh );
+			renderer.setScissor( sizew, 0, sizew, sizeh );
 			renderer.render( sceneR, cameraR );
 
 			renderer.enableScissorTest( false );
@@ -39100,7 +39100,21 @@ function CardboardDistorter(renderer) {
 module.exports = CardboardDistorter;
 
 },{"./device-info.js":15}],15:[function(require,module,exports){
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*
+ * Copyright 2015 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var Util = require('./util.js');
 
 // Width, height and bevel measurements done on real iPhones.
@@ -39140,6 +39154,9 @@ var Enclosures = {
 };
 
 
+var DEFAULT_LEFT_CENTER = {x: 0.5, y: 0.5};
+var DEFAULT_RIGHT_CENTER = {x: 0.5, y: 0.5};
+
 /**
  * Gives the correct device DPI based on screen dimensions and user agent.
  * For now, only iOS is supported.
@@ -39152,7 +39169,10 @@ function DeviceInfo() {
 /**
  * Gets the coordinates (in [0, 1]) for the left eye.
  */
-DeviceInfo.prototype.getLeftCentroid = function() {
+DeviceInfo.prototype.getLeftEyeCenter = function() {
+  if (!this.device) {
+    return DEFAULT_LEFT_CENTER;
+  }
   // Get parameters from the enclosure.
   var eyeToMid = this.enclosure.ipdMm / 2;
   var eyeToBase = this.enclosure.baselineLensCenterMm;
@@ -39168,6 +39188,14 @@ DeviceInfo.prototype.getLeftCentroid = function() {
   var py = 1 - (eyeToBevel / heightMm);
 
   return {x: px, y: py};
+};
+
+DeviceInfo.prototype.getRightEyeCenter = function() {
+  if (!this.device) {
+    return DEFAULT_RIGHT_CENTER;
+  }
+  var left = this.getLeftEyeCenter();
+  return {x: 1 - left.x, y: left.y};
 };
 
 DeviceInfo.prototype.determineDevice_ = function() {
@@ -39199,7 +39227,6 @@ DeviceInfo.prototype.determineDevice_ = function() {
 };
 
 
-
 function Device(params) {
   this.width = params.width;
   this.height = params.height;
@@ -39221,52 +39248,7 @@ function CardboardEnclosure(params) {
 
 module.exports = DeviceInfo;
 
-},{"./util.js":2}],2:[function(require,module,exports){
-var Util = {};
-
-Util.base64 = function(mimeType, base64) {
-  return 'data:' + mimeType + ';base64,' + base64;
-};
-
-Util.isMobile = function() {
-  var check = false;
-  (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true})(navigator.userAgent||navigator.vendor||window.opera);
-  return check;
-};
-
-Util.isIOS = function() {
-  return /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
-};
-
-module.exports = Util;
-
-},{}],3:[function(require,module,exports){
-var DeviceInfo = require('../src/device-info.js');
-
-var di = new DeviceInfo();
-var centroid = di.getLeftCentroid();
-
-// Size the canvas. Render the centroid.
-var canvas = document.querySelector('canvas');
-var w = window.innerWidth;
-var h = window.innerHeight;
-var x = centroid.x * w/2;
-var y = centroid.y * h;
-var size = 10;
-
-canvas.width = w;
-canvas.height = h;
-
-var ctx = canvas.getContext('2d');
-ctx.clearRect(0, 0, w, h);
-ctx.fillStyle = 'black';
-ctx.fillRect(x - size/2, y - size/2, size, size);
-
-console.log('Placing eye at (%d, %d).', x, y);
-
-},{"../src/device-info.js":1}]},{},[3]);
-
-},{"../src/device-info.js":15,"./util.js":18}],16:[function(require,module,exports){
+},{"./util.js":18}],16:[function(require,module,exports){
 /*
  * Copyright 2015 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39589,7 +39571,7 @@ var Util = require('./util.js');
  * - Wake lock
  * - Orientation lock (mobile only)
  */
-function WebVRManager(renderer, effect, params) {
+module.exports.WebVRManager = function(renderer, effect, params) {
   this.params = params || {};
 
   this.mode = Modes.UNKNOWN;
@@ -39598,8 +39580,8 @@ function WebVRManager(renderer, effect, params) {
   var hideButton = this.params.hideButton || false;
 
   // Save the THREE.js renderer and effect for later.
-  this.renderer = renderer;
-  this.effect = effect;
+  this.renderer = window.renderer;
+  this.effect = window.effect;
   this.distorter = new CardboardDistorter(renderer);
 
   this.button = new WebVRButton();
@@ -39630,7 +39612,7 @@ function WebVRManager(renderer, effect, params) {
 /**
  * Promise returns true if there is at least one HMD device available.
  */
-WebVRManager.prototype.getHMD_ = function() {
+module.exports.WebVRManager.prototype.getHMD_ = function() {
   return new Promise(function(resolve, reject) {
     navigator.getVRDevices().then(function(devices) {
       // Promise succeeds, but check if there are any devices actually.
@@ -39648,11 +39630,11 @@ WebVRManager.prototype.getHMD_ = function() {
   });
 };
 
-WebVRManager.prototype.isVRMode = function() {
+module.exports.WebVRManager.prototype.isVRMode = function() {
   return this.mode == Modes.VR;
 };
 
-WebVRManager.prototype.render = function(scene, camera) {
+module.exports.WebVRManager.prototype.render = function(scene, camera) {
   if (this.isVRMode()) {
     this.distorter.preRender();
     this.effect.render(scene, camera);
@@ -39665,7 +39647,7 @@ WebVRManager.prototype.render = function(scene, camera) {
 /**
  * Makes it possible to go into VR mode.
  */
-WebVRManager.prototype.activateVR_ = function() {
+module.exports.WebVRManager.prototype.activateVR_ = function() {
   // Or via clicking on the VR button.
   this.button.on('click', this.toggleVRMode.bind(this));
 
@@ -39679,17 +39661,17 @@ WebVRManager.prototype.activateVR_ = function() {
   this.wakelock = new Wakelock();
 };
 
-WebVRManager.prototype.activateImmersive_ = function() {
+module.exports.WebVRManager.prototype.activateImmersive_ = function() {
   // Next time a user does anything with their mouse, we trigger immersive mode.
   this.button.on('click', this.enterImmersive.bind(this));
 };
 
-WebVRManager.prototype.enterImmersive = function() {
+module.exports.WebVRManager.prototype.enterImmersive = function() {
   this.requestPointerLock_();
   this.requestFullscreen_();
 };
 
-WebVRManager.prototype.toggleVRMode = function() {
+module.exports.WebVRManager.prototype.toggleVRMode = function() {
   if (!this.isVRMode()) {
     // Enter VR mode.
     this.enterVR();
@@ -39698,7 +39680,7 @@ WebVRManager.prototype.toggleVRMode = function() {
   }
 };
 
-WebVRManager.prototype.onFullscreenChange_ = function(e) {
+module.exports.WebVRManager.prototype.onFullscreenChange_ = function(e) {
   // If we leave full-screen, also exit VR mode.
   if (document.webkitFullscreenElement === null ||
       document.mozFullScreenElement === null) {
@@ -39706,7 +39688,7 @@ WebVRManager.prototype.onFullscreenChange_ = function(e) {
   }
 };
 
-WebVRManager.prototype.requestPointerLock_ = function() {
+module.exports.WebVRManager.prototype.requestPointerLock_ = function() {
   var canvas = this.renderer.domElement;
   canvas.requestPointerLock = canvas.requestPointerLock ||
       canvas.mozRequestPointerLock ||
@@ -39717,7 +39699,7 @@ WebVRManager.prototype.requestPointerLock_ = function() {
   }
 };
 
-WebVRManager.prototype.releasePointerLock_ = function() {
+module.exports.WebVRManager.prototype.releasePointerLock_ = function() {
   document.exitPointerLock = document.exitPointerLock ||
       document.mozExitPointerLock ||
       document.webkitExitPointerLock;
@@ -39727,19 +39709,19 @@ WebVRManager.prototype.releasePointerLock_ = function() {
   }
 };
 
-WebVRManager.prototype.requestOrientationLock_ = function() {
+module.exports.WebVRManager.prototype.requestOrientationLock_ = function() {
   if (screen.orientation && Util.isMobile()) {
     screen.orientation.lock('landscape');
   }
 };
 
-WebVRManager.prototype.releaseOrientationLock_ = function() {
+module.exports.WebVRManager.prototype.releaseOrientationLock_ = function() {
   if (screen.orientation) {
     screen.orientation.unlock();
   }
 };
 
-WebVRManager.prototype.requestFullscreen_ = function() {
+module.exports.WebVRManager.prototype.requestFullscreen_ = function() {
   var canvas = this.renderer.domElement;
   if (canvas.mozRequestFullScreen) {
     canvas.mozRequestFullScreen();
@@ -39748,7 +39730,7 @@ WebVRManager.prototype.requestFullscreen_ = function() {
   }
 };
 
-WebVRManager.prototype.enterVR = function() {
+module.exports.WebVRManager.prototype.enterVR = function() {
   console.log('Entering VR.');
   // Enter fullscreen mode (note: this doesn't work in iOS).
   this.effect.setFullScreen(true);
@@ -39763,7 +39745,7 @@ WebVRManager.prototype.enterVR = function() {
   this.distorter.patch();
 };
 
-WebVRManager.prototype.exitVR = function() {
+module.exports.WebVRManager.prototype.exitVR = function() {
   console.log('Exiting VR.');
   // Leave fullscreen mode (note: this doesn't work in iOS).
   this.effect.setFullScreen(false);
@@ -39781,6 +39763,6 @@ WebVRManager.prototype.exitVR = function() {
   this.distorter.unpatch();
 };
 
-module.exports = WebVRManager;
+//module.exports = WebVRManager;
 
 },{"./cardboard-distorter.js":14,"./modes.js":17,"./util.js":18,"./wakelock.js":19,"./webvr-button.js":20}]},{},[2]);

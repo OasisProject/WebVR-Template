@@ -35,7 +35,7 @@ var Util = require('./util.js');
  * - Wake lock
  * - Orientation lock (mobile only)
  */
-function WebVRManager(renderer, effect, params) {
+module.exports.WebVRManager = function(renderer, effect, params) {
   this.params = params || {};
 
   this.mode = Modes.UNKNOWN;
@@ -44,8 +44,8 @@ function WebVRManager(renderer, effect, params) {
   var hideButton = this.params.hideButton || false;
 
   // Save the THREE.js renderer and effect for later.
-  this.renderer = renderer;
-  this.effect = effect;
+  this.renderer = window.renderer;
+  this.effect = window.effect;
   this.distorter = new CardboardDistorter(renderer);
 
   this.button = new WebVRButton();
@@ -76,7 +76,7 @@ function WebVRManager(renderer, effect, params) {
 /**
  * Promise returns true if there is at least one HMD device available.
  */
-WebVRManager.prototype.getHMD_ = function() {
+module.exports.WebVRManager.prototype.getHMD_ = function() {
   return new Promise(function(resolve, reject) {
     navigator.getVRDevices().then(function(devices) {
       // Promise succeeds, but check if there are any devices actually.
@@ -94,11 +94,11 @@ WebVRManager.prototype.getHMD_ = function() {
   });
 };
 
-WebVRManager.prototype.isVRMode = function() {
+module.exports.WebVRManager.prototype.isVRMode = function() {
   return this.mode == Modes.VR;
 };
 
-WebVRManager.prototype.render = function(scene, camera) {
+module.exports.WebVRManager.prototype.render = function(scene, camera) {
   if (this.isVRMode()) {
     this.distorter.preRender();
     this.effect.render(scene, camera);
@@ -111,7 +111,7 @@ WebVRManager.prototype.render = function(scene, camera) {
 /**
  * Makes it possible to go into VR mode.
  */
-WebVRManager.prototype.activateVR_ = function() {
+module.exports.WebVRManager.prototype.activateVR_ = function() {
   // Or via clicking on the VR button.
   this.button.on('click', this.toggleVRMode.bind(this));
 
@@ -125,17 +125,17 @@ WebVRManager.prototype.activateVR_ = function() {
   this.wakelock = new Wakelock();
 };
 
-WebVRManager.prototype.activateImmersive_ = function() {
+module.exports.WebVRManager.prototype.activateImmersive_ = function() {
   // Next time a user does anything with their mouse, we trigger immersive mode.
   this.button.on('click', this.enterImmersive.bind(this));
 };
 
-WebVRManager.prototype.enterImmersive = function() {
+module.exports.WebVRManager.prototype.enterImmersive = function() {
   this.requestPointerLock_();
   this.requestFullscreen_();
 };
 
-WebVRManager.prototype.toggleVRMode = function() {
+module.exports.WebVRManager.prototype.toggleVRMode = function() {
   if (!this.isVRMode()) {
     // Enter VR mode.
     this.enterVR();
@@ -144,7 +144,7 @@ WebVRManager.prototype.toggleVRMode = function() {
   }
 };
 
-WebVRManager.prototype.onFullscreenChange_ = function(e) {
+module.exports.WebVRManager.prototype.onFullscreenChange_ = function(e) {
   // If we leave full-screen, also exit VR mode.
   if (document.webkitFullscreenElement === null ||
       document.mozFullScreenElement === null) {
@@ -152,7 +152,7 @@ WebVRManager.prototype.onFullscreenChange_ = function(e) {
   }
 };
 
-WebVRManager.prototype.requestPointerLock_ = function() {
+module.exports.WebVRManager.prototype.requestPointerLock_ = function() {
   var canvas = this.renderer.domElement;
   canvas.requestPointerLock = canvas.requestPointerLock ||
       canvas.mozRequestPointerLock ||
@@ -163,7 +163,7 @@ WebVRManager.prototype.requestPointerLock_ = function() {
   }
 };
 
-WebVRManager.prototype.releasePointerLock_ = function() {
+module.exports.WebVRManager.prototype.releasePointerLock_ = function() {
   document.exitPointerLock = document.exitPointerLock ||
       document.mozExitPointerLock ||
       document.webkitExitPointerLock;
@@ -173,19 +173,19 @@ WebVRManager.prototype.releasePointerLock_ = function() {
   }
 };
 
-WebVRManager.prototype.requestOrientationLock_ = function() {
+module.exports.WebVRManager.prototype.requestOrientationLock_ = function() {
   if (screen.orientation && Util.isMobile()) {
     screen.orientation.lock('landscape');
   }
 };
 
-WebVRManager.prototype.releaseOrientationLock_ = function() {
+module.exports.WebVRManager.prototype.releaseOrientationLock_ = function() {
   if (screen.orientation) {
     screen.orientation.unlock();
   }
 };
 
-WebVRManager.prototype.requestFullscreen_ = function() {
+module.exports.WebVRManager.prototype.requestFullscreen_ = function() {
   var canvas = this.renderer.domElement;
   if (canvas.mozRequestFullScreen) {
     canvas.mozRequestFullScreen();
@@ -194,7 +194,7 @@ WebVRManager.prototype.requestFullscreen_ = function() {
   }
 };
 
-WebVRManager.prototype.enterVR = function() {
+module.exports.WebVRManager.prototype.enterVR = function() {
   console.log('Entering VR.');
   // Enter fullscreen mode (note: this doesn't work in iOS).
   this.effect.setFullScreen(true);
@@ -209,7 +209,7 @@ WebVRManager.prototype.enterVR = function() {
   this.distorter.patch();
 };
 
-WebVRManager.prototype.exitVR = function() {
+module.exports.WebVRManager.prototype.exitVR = function() {
   console.log('Exiting VR.');
   // Leave fullscreen mode (note: this doesn't work in iOS).
   this.effect.setFullScreen(false);
@@ -227,4 +227,4 @@ WebVRManager.prototype.exitVR = function() {
   this.distorter.unpatch();
 };
 
-module.exports = WebVRManager;
+//module.exports = WebVRManager;
