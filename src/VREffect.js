@@ -127,10 +127,8 @@ module.exports.VREffect = function ( renderer, onError ) {
 
 			}
 
-			var sizew = renderer.width;
-            var sizeh = renderer.height;
-            
-			sizew /= 2;
+			var size = renderer.getSize();
+			size.width /= 2;
 
 			renderer.enableScissorTest( true );
 			renderer.clear();
@@ -147,13 +145,13 @@ module.exports.VREffect = function ( renderer, onError ) {
 			cameraR.translateX( eyeTranslationR.x * this.scale );
 
 			// render left eye
-			renderer.setViewport( 0, 0, sizew, sizeh );
-			renderer.setScissor( 0, 0, sizew, sizeh );
+			renderer.setViewport( 0, 0, size.width, size.height );
+			renderer.setScissor( 0, 0, size.width, size.height );
 			renderer.render( sceneL, cameraL );
 
 			// render right eye
-			renderer.setViewport( sizew, 0, sizew, sizeh );
-			renderer.setScissor( sizew, 0, sizew, sizeh );
+			renderer.setViewport( size.width, 0, size.width, size.height );
+			renderer.setScissor( size.width, 0, size.width, size.height );
 			renderer.render( sceneR, cameraR );
 
 			renderer.enableScissorTest( false );
